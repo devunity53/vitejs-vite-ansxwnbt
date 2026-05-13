@@ -305,6 +305,15 @@ const css = `
     border-radius: 10px; padding: 8px 14px; font-family: inherit;
     font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap;
   }
+
+  /* ── ICON BUTTONS ── */
+  .icon-btn {
+    background: none; border: none; cursor: pointer; font-size: 24px;
+    padding: 8px; display: flex; align-items: center; justify-content: center;
+    border-radius: 10px; transition: all 0.2s;
+  }
+  .icon-btn:hover { background: var(--bg); }
+  .icon-btn.selected { background: var(--primary-light); }
 `;
 
 // ─── PWA HELPERS ──────────────────────────────────────────────────────────[...]
@@ -619,7 +628,7 @@ function TasksScreen({ profile, refetch }) {
               <button className="modal-close" onClick={() => setShowCreate(false)}>×</button>
             </div>
             <div className="field"><label>Titre *</label><input placeholder="Ranger sa chambre..." value={title} onChange={e => setTitle(e.target.value)} /></div>
-            <div className="field"><label>Description</label><textarea placeholder="Détails de la tâche..." value={desc} onChange={e => setDesc(e.target.value)} /></div>
+            <div className="field"><label>Description</label><textarea placeholder="Détails de la tâche..." value={desc} onChange={e => setDesc(e.target.value)} /></textarea></div>
             <div className="field">
               <label>Récompense : {reward} {COIN_SYMBOL} {COIN_NAME}s</label>
               <input type="range" min="1" max="100" value={reward} onChange={e => setReward(e.target.value)} style={{ marginBottom: 4 }} />
@@ -705,8 +714,11 @@ function ShopScreen({ profile, refetch }) {
               <label>Icône</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {ICONS.map(ic => (
-                  <button key={ic} onClick={() => setForm({ ...form, icon: ic })}
-                    style={{ background: form.icon === ic ? 'var(--primary-light)' : 'var(--bg)', border: form.icon === ic ? '2px solid var(--primary)' : '1.5px solid var(--border)', borderRadius: 10, padding: '12px', cursor: 'pointer', fontSize: 24, transition: 'all 0.2s' }}
+                  <button
+                    key={ic}
+                    className={`icon-btn ${form.icon === ic ? 'selected' : ''}`}
+                    onClick={() => setForm({ ...form, icon: ic })}
+                  >
                     {ic}
                   </button>
                 ))}
