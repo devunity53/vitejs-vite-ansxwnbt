@@ -627,7 +627,7 @@ function TasksScreen({ profile, refetch }) {
               <button className="modal-close" onClick={() => setShowCreate(false)}>×</button>
             </div>
             <div className="field"><label>Titre *</label><input placeholder="Ranger sa chambre..." value={title} onChange={e => setTitle(e.target.value)} /></div>
-            <div className="field"><label>Description</label><textarea placeholder="Détails de la tâche..." value={desc} onChange={e => setDesc(e.target.value)} /></textarea></div>
+            <div className="field"><label>Description</label><textarea placeholder="Détails de la tâche..." value={desc} onChange={e => setDesc(e.target.value)}></textarea></div>
             <div className="field">
               <label>Récompense : {reward} {COIN_SYMBOL} {COIN_NAME}s</label>
               <input type="range" min="1" max="100" value={reward} onChange={e => setReward(e.target.value)} style={{ marginBottom: 4 }} />
