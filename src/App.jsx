@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// ─── CONFIG ────────────────────────────────────────────────────────────[...]
 const SUPABASE_URL = 'https://pkkbbgwseaogntclnsrt.supabase.co';
 const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBra2JiZ3dzZWFvZ250Y2xuc3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODM2MDAsImV4cCI6MjA5NDI1OTYwMH0.en2kRneOe7-ZAQO5-StdEa4-WCbH9aRfKPKS2_P6qok';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBra2JiZ3dzZWFvZ250Y2xuc3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODM2MDAsImV4cCI6MjA5NDI1OTYwMH0.en2kRneOe7-ZAQO5-StdEa4-WCbH9aRf[...]
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const COIN_NAME = 'Étoile';
 const COIN_SYMBOL = '⭐';
 
-// ─── STYLES ───────────────────────────────────────────────────────────────────
+// ─── STYLES ────────────────────────────────────────────────────────────[...]
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -307,7 +307,7 @@ const css = `
   }
 `;
 
-// ─── PWA HELPERS ─────────────────────────────────────────────────────────────
+// ─── PWA HELPERS ──────────────────────────────────────────────────────────[...]
 let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -368,7 +368,7 @@ function timeAgo(dateStr) {
   return `Il y a ${Math.floor(h / 24)}j`;
 }
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
+// ─── HELPERS ──────────────────────────────────────────────────────────[...]
 function useSupabase() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -405,18 +405,21 @@ async function sendNotification(familyId, fromId, title, body, type = 'info', ta
   if (targetRole) q.eq('role', targetRole);
   const { data: targets } = await q;
   if (!targets?.length) return;
-  const rows = targets.map(t => ({
-    user_id: t.id,
-    family_id: familyId,
-    title,
-    body,
-    type,
-    read: false,
-  }));
-  await supabase.from('notifications').insert(rows);
+
+  const userIds = targets.map(t => t.id);
+
+  // 1. Notification in-app
+  await supabase.from('notifications').insert(
+    userIds.map(id => ({ user_id: id, family_id: familyId, title, body, type, read: false }))
+  );
+
+  // 2. Push natif (app fermée)
+  await supabase.functions.invoke('send-push', {
+    body: { user_ids: userIds, title, body }
+  });
 }
 
-// ─── COMPONENTS ──────────────────────────────────────────────────────────────
+// ─── COMPONENTS ──────────────────────────────────────────────────────────[...]
 function TaskCard({ task, profile, onAction, onApprove, onReject }) {
   const canAccept = profile?.role === 'child' && task.status === 'open' && !task.accepted_by;
   const isMyTask = task.accepted_by === profile?.id;
@@ -457,7 +460,7 @@ function TaskCard({ task, profile, onAction, onApprove, onReject }) {
   );
 }
 
-// ─── SCREENS ─────────────────────────────────────────────────────────────────
+// ─── SCREENS ──────────────────────────────────────────────────────────[...]
 
 // Auth
 function AuthScreen() {
@@ -600,8 +603,8 @@ function TasksScreen({ profile, refetch }) {
         </div>
         {loading ? <div className="spinner">Chargement...</div> : (
           <>
-            {pending.length > 0 && (<><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--warning)', marginBottom: 8 }}>⏳ En attente de validation</div>{pending.map(t => <TaskCard key={t.id} task={t} profile={profile} onAction={handleAction} onApprove={handleApprove} onReject={handleReject} />)}<div className="divider" /></>)}
-            {inProgress.length > 0 && (<><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--warning)', marginBottom: 8 }}>🔄 En cours</div>{inProgress.map(t => <TaskCard key={t.id} task={t} profile={profile} onAction={handleAction} onApprove={handleApprove} onReject={handleReject} />)}<div className="divider" /></>)}
+            {pending.length > 0 && (<><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--warning)', marginBottom: 8 }}>⏳ En attente de validation</div>{pending.map(t => <TaskCard key={t.id} task={t} profile={profile} onAction={handleAction} onApprove={handleApprove} onReject={handleReject} />)}</>)}
+            {inProgress.length > 0 && (<><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--warning)', marginBottom: 8 }}>🔄 En cours</div>{inProgress.map(t => <TaskCard key={t.id} task={t} profile={profile} onAction={handleAction} onApprove={handleApprove} onReject={handleReject} />)}</>)}
             {open.length > 0 && (<><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary)', marginBottom: 8 }}>🌟 Disponibles</div>{open.map(t => <TaskCard key={t.id} task={t} profile={profile} onAction={handleAction} onApprove={handleApprove} onReject={handleReject} />)}</>)}
             {profile.role === 'parent' && done.length > 0 && (<><div className="divider" /><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--success)', marginBottom: 8 }}>✅ Terminées</div>{done.map(t => <TaskCard key={t.id} task={t} profile={profile} onAction={handleAction} onApprove={handleApprove} onReject={handleReject} />)}</>)}
             {tasks.length === 0 && <div className="empty"><div className="empty-icon">📋</div><p>{profile.role === 'parent' ? 'Aucune tâche créée. Commencez !' : "Aucune tâche disponible."}</p></div>}
@@ -703,7 +706,7 @@ function ShopScreen({ profile, refetch }) {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {ICONS.map(ic => (
                   <button key={ic} onClick={() => setForm({ ...form, icon: ic })}
-                    style={{ background: form.icon === ic ? 'var(--primary-light)' : 'var(--bg)', border: form.icon === ic ? '2px solid var(--primary)' : '1.5px solid var(--border)', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', fontSize: 20 }}>
+                    style={{ background: form.icon === ic ? 'var(--primary-light)' : 'var(--bg)', border: form.icon === ic ? '2px solid var(--primary)' : '1.5px solid var(--border)', borderRadius: 10, padding: '12px', cursor: 'pointer', fontSize: 24, transition: 'all 0.2s' }}
                     {ic}
                   </button>
                 ))}
@@ -778,7 +781,7 @@ function RedemptionsScreen({ profile, refetch }) {
           {done.map(r => (
             <div key={r.id} className="card" style={{ opacity: 0.7 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div><span style={{ fontSize: 18, marginRight: 8 }}>{r.shop_items?.icon}</span><span style={{ fontWeight: 700, fontSize: 14 }}>{r.shop_items?.name}</span><span style={{ fontSize: 12, color: 'var(--muted)', marginLeft: 6 }}>— {r.profiles?.name}</span></div>
+                <div><span style={{ fontSize: 18, marginRight: 8 }}>{r.shop_items?.icon}</span><span style={{ fontWeight: 700, fontSize: 14 }}>{r.shop_items?.name}</span><span style={{ fontSize: 12, color: 'var(--muted)' }}>{timeAgo(r.created_at)}</span></div>
                 <span className={`badge ${r.status === 'approved' ? 'badge-success' : 'badge-warning'}`}>{r.status === 'approved' ? '✓' : '✗'}</span>
               </div>
             </div>
@@ -790,7 +793,7 @@ function RedemptionsScreen({ profile, refetch }) {
   );
 }
 
-// ── CHAT ─────────────────────────────────────────────────────────────────────
+// ── CHAT ────────────────────────────────────────────────────────────[...]
 function ChatScreen({ profile }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
@@ -955,7 +958,7 @@ function NotificationsScreen({ profile, onRead }) {
   );
 }
 
-// ── PROFILE ──────────────────────────────────────────────────────────────────
+// ── PROFILE ───────────────────────────────────────────────────────────[...]
 function ProfileScreen({ profile, refetch }) {
   const [family, setFamily] = useState(null);
   const [members, setMembers] = useState([]);
@@ -1069,7 +1072,7 @@ function ProfileScreen({ profile, refetch }) {
   );
 }
 
-// ─── APP ─────────────────────────────────────────────────────────────────────
+// ─── APP ───────────────────────────────────────────────────────────[...]
 export default function App() {
   const { user, profile, loading, refetchProfile } = useSupabase();
   const [tab, setTab] = useState('tasks');
