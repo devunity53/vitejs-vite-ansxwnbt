@@ -3,8 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────[...]
 const SUPABASE_URL = 'https://pkkbbgwseaogntclnsrt.supabase.co';
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBra2JiZ3dzZWFvZ250Y2xuc3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODM2MDAsImV4cCI6MjA5NDI1OTYwMH0.en2kRneOe7-ZAQO5-StdEa4-WCbH9aRf[...]
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBra2JiZ3dzZWFvZ250Y2xuc3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODM2MDAsImV4cCI6MjA5NDI1OTYwMH0.en2kRneOe7-ZAQO5-StdEa4-WCbH9aRfKPKS2_P6qok';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const COIN_NAME = 'Étoile';
