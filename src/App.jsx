@@ -332,7 +332,7 @@ async function subscribePush(userId) {
       await savePushSub(userId, existing);
       return;
     }
-    const VAPID_PUBLIC = 'BBtry6BgC6rvd-vlGvYaitctL9CNfpdIAo2xUjjz7mXhKD6r4aJ__QfWsC3ZOWbcvtyJJjctMMUDwV077-MeFQM'; // remplacer
+    const VAPID_PUBLIC = 'BLRwCbkhBhdtoNRc3x47LuBo-Jp5YEQeBVfiwlt4DP7fFU8PJ6dpBtr89kia996KFdGNn-q3xdjnmXrcGiEgn0s'; // remplacer
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
